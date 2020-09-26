@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-[ExecuteInEditMode]
+//[ExecuteInEditMode]
 public class WorldCreator : MonoBehaviour
 {
 	public static WorldCreator Instance;
@@ -27,13 +27,13 @@ public class WorldCreator : MonoBehaviour
 		foreach ( var block in Layout )
 		{
 			block.GetComponent<Chunk>().Pos = new Vector2( x, y );
-			if ( x == 1 && y == 1 )
+			if ( x == 2 && y == 2 )
 			{
 				Chunk.LastPlayerChunk = block.GetComponent<Chunk>();
 			}
 
 			x++;
-			if ( x > 2 )
+			if ( x > 4 )
 			{
 				y++;
 				x = 0;
@@ -47,21 +47,24 @@ public class WorldCreator : MonoBehaviour
 	void Update()
 	{
 		//Generate();
-		if ( Input.GetKeyDown( KeyCode.DownArrow ) )
+		if ( Application.isEditor )
 		{
-			Chunk.MoveDir( new Vector2( 0, 1 ) );
-		}
-		if ( Input.GetKeyDown( KeyCode.UpArrow ) )
-		{
-			Chunk.MoveDir( new Vector2( 0, -1 ) );
-		}
-		if ( Input.GetKeyDown( KeyCode.LeftArrow ) )
-		{
-			Chunk.MoveDir( new Vector2( -1, 0 ) );
-		}
-		if ( Input.GetKeyDown( KeyCode.RightArrow ) )
-		{
-			Chunk.MoveDir( new Vector2( 1, 0 ) );
+			if ( Input.GetKeyDown( KeyCode.DownArrow ) )
+			{
+				Chunk.MoveDir( new Vector2( 0, 1 ) );
+			}
+			if ( Input.GetKeyDown( KeyCode.UpArrow ) )
+			{
+				Chunk.MoveDir( new Vector2( 0, -1 ) );
+			}
+			if ( Input.GetKeyDown( KeyCode.LeftArrow ) )
+			{
+				Chunk.MoveDir( new Vector2( -1, 0 ) );
+			}
+			if ( Input.GetKeyDown( KeyCode.RightArrow ) )
+			{
+				Chunk.MoveDir( new Vector2( 1, 0 ) );
+			}
 		}
 	}
 
