@@ -134,11 +134,11 @@ public class Player : PunBehaviour
 	void SendChirp( bool addfollower )
 	{
 		// Sound
-		StaticHelpers.SpawnResourceAudioSource( "chirp" + Random.Range( 1, 5 ), transform.position, Random.Range( 0.8f, 1.2f ) );
-		//if ( Followee != null )
-		//{
-		//	Followee.Chirp();
-		//}
+		StaticHelpers.SpawnResourceAudioSource( "chirp" + Random.Range( 3, 5 ), transform.position, Random.Range( 0.8f, 1.2f ) );
+		if ( Followee != null )
+		{
+			Followee.Chirp();
+		}
 
 		GetComponentInChildren<Punchable>().Punch();
 	}

@@ -53,7 +53,7 @@ public class BordFollower : MonoBehaviour
 	{
 		yield return new WaitForSeconds( Random.Range( 0.1f, 0.2f ) / 2 );
 
-		StaticHelpers.SpawnResourceAudioSource( "chirp" + Random.Range( 1, 5 ), transform.position, Random.Range( 0.8f, 1.2f ), 0.5f );
+		StaticHelpers.SpawnResourceAudioSource( "chirp" + Random.Range( 3, 5 ), transform.position, Random.Range( 0.8f, 1.2f ), 0.5f );
 		GetComponentInChildren<Punchable>().Punch();
 
 		yield return new WaitForSeconds( Random.Range( 0.1f, 0.2f ) / 2 );
