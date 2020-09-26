@@ -32,22 +32,22 @@ public class Chunk : MonoBehaviour
 
 	private void Update()
 	{
-		if ( Bord.Instance != null )
+		if ( LocalPlayer.Instance != null )
 		{
-			float distancex = Mathf.Abs( transform.position.x - Bord.Instance.transform.position.x );
-			float distancey = Mathf.Abs( transform.position.z - Bord.Instance.transform.position.z );
+			float distancex = Mathf.Abs( transform.position.x - LocalPlayer.Instance.transform.position.x );
+			float distancey = Mathf.Abs( transform.position.z - LocalPlayer.Instance.transform.position.z );
 			//Debug.Log( distancex + " " + distancey );
 
 			float MOVE_TRIGGER = 120;
-			float x = -Mathf.Sign( transform.position.x - Bord.Instance.transform.position.x );
-			if ( distancex > MOVE_TRIGGER && -Mathf.Sign( Bord.Instance.Direction.x ) == x )
+			float x = -Mathf.Sign( transform.position.x - LocalPlayer.Instance.transform.position.x );
+			if ( distancex > MOVE_TRIGGER && -Mathf.Sign( LocalPlayer.Instance.Direction.x ) == x )
 			{
 				CachedMoveDir = new Vector2( x, CachedMoveDir.y );
 			}
-			float y = Mathf.Sign( transform.position.z - Bord.Instance.transform.position.z );
-			if ( distancey > MOVE_TRIGGER && Mathf.Sign( Bord.Instance.Direction.z ) == y )
+			float y = Mathf.Sign( transform.position.z - LocalPlayer.Instance.transform.position.z );
+			if ( distancey > MOVE_TRIGGER && Mathf.Sign( LocalPlayer.Instance.Direction.z ) == y )
 			{
-				CachedMoveDir = new Vector2( CachedMoveDir.x, Mathf.Sign( transform.position.z - Bord.Instance.transform.position.z ) );
+				CachedMoveDir = new Vector2( CachedMoveDir.x, Mathf.Sign( transform.position.z - LocalPlayer.Instance.transform.position.z ) );
 			}
 		}
 	}
@@ -193,6 +193,6 @@ public class Chunk : MonoBehaviour
 
 	public void UpdateText()
 	{
-		GetComponentInChildren<Text>().text = Pos.ToString();
+		//GetComponentInChildren<Text>().text = Pos.ToString();
 	}
 }

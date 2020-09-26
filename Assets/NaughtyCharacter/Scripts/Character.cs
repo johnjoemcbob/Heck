@@ -56,8 +56,8 @@ namespace NaughtyCharacter
 		public GravitySettings GravitySettings;
 		public RotationSettings RotationSettings;
 
-		private CharacterController _characterController; // The Unity's CharacterController
-		private CharacterAnimator _characterAnimator;
+		public CharacterController _characterController; // The Unity's CharacterController
+		public CharacterAnimator _characterAnimator;
 
 		private float _targetHorizontalSpeed; // In meters/second
 		private float _horizontalSpeed; // In meters/second
@@ -69,6 +69,8 @@ namespace NaughtyCharacter
 		private bool _hasMovementInput;
 		private bool _jumpInput;
 
+		public bool CanInput = true;
+
 		public Vector3 Velocity => _characterController.velocity;
 		public Vector3 HorizontalVelocity => _characterController.velocity.SetY(0.0f);
 		public Vector3 VerticalVelocity => _characterController.velocity.Multiply(0.0f, 1.0f, 0.0f);
@@ -79,8 +81,8 @@ namespace NaughtyCharacter
 			Controller.Init();
 			Controller.Character = this;
 
-			_characterController = GetComponent<CharacterController>();
-			_characterAnimator = GetComponent<CharacterAnimator>();
+			//_characterController = GetComponent<CharacterController>();
+			//_characterAnimator = GetComponent<CharacterAnimator>();
 		}
 
 		private void Update()
@@ -99,14 +101,20 @@ namespace NaughtyCharacter
 			UpdateHorizontalSpeed();
 			UpdateVerticalSpeed();
 
-			Vector3 movement = _horizontalSpeed * GetMovementDirection() + _verticalSpeed * Vector3.up;
-			_characterController.Move(movement * Time.deltaTime);
+			if ( _characterController != null )
+			{
+				Vector3 movement = _horizontalSpeed * GetMovementDirection() + _verticalSpeed * Vector3.up;
+				_characterController.Move( movement * Time.deltaTime );
 
-			OrientToTargetRotation(movement.SetY(0.0f));
+				OrientToTargetRotation( movement.SetY( 0.0f ) );
 
-			IsGrounded = _characterController.isGrounded;
+				IsGrounded = _characterController.isGrounded;
+			}
 
-			_characterAnimator.UpdateState();
+			if ( _characterAnimator != null )
+			{
+				//_characterAnimator.UpdateState();
+			}
 		}
 
 		public void SetMovementInput(Vector3 movementInput)
@@ -184,6 +192,12 @@ namespace NaughtyCharacter
 			}
 		}
 
+		public void Stop()
+		{
+			_horizontalSpeed = 0;
+			_verticalSpeed = 0;
+		}
+
 		private Vector3 GetMovementDirection()
 		{
 			Vector3 moveDir = _hasMovementInput ? _movementInput : _lastMovementInput;
@@ -204,12 +218,12 @@ namespace NaughtyCharacter
 
 				Quaternion targetRotation = Quaternion.LookRotation(horizontalMovement, Vector3.up);
 
-				transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
+				transform.parent.rotation = Quaternion.RotateTowards(transform.parent.rotation, targetRotation, rotationSpeed * Time.deltaTime);
 			}
 			else if (RotationSettings.UseControlRotation)
 			{
 				Quaternion targetRotation = Quaternion.Euler(0.0f, _controlRotation.y, 0.0f);
-				transform.rotation = targetRotation;
+				transform.parent.rotation = targetRotation;
 			}
 		}
 	}

@@ -18,11 +18,19 @@ namespace NaughtyCharacter
 
 		public override void OnCharacterUpdate()
 		{
-			_playerInput.UpdateInput();
+			if ( Character.CanInput )
+			{
+				_playerInput.UpdateInput();
 
-			UpdateControlRotation();
-			Character.SetMovementInput(GetMovementInput());
-			Character.SetJumpInput(_playerInput.JumpInput);
+				UpdateControlRotation();
+				Character.SetMovementInput(GetMovementInput());
+				Character.SetJumpInput(_playerInput.JumpInput);
+			}
+			else
+			{
+				Character.SetMovementInput( Vector3.zero );
+				Character.SetJumpInput( false );
+			}
 		}
 
 		public override void OnCharacterFixedUpdate()

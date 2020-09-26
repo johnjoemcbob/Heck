@@ -3,18 +3,22 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class Bord : MonoBehaviour
+public class LocalPlayer : MonoBehaviour
 {
-	public static Bord Instance;
+	public static LocalPlayer Instance;
 
 	public Transform LastFollower;
 	public GameObject Win;
+
+	public Player Player;
 
 	[HideInInspector]
 	public BordFollower Followee;
 	[HideInInspector]
 	public Vector3 Direction;
 	private Vector3 LastPos;
+	private bool grounded = true;
+	private NaughtyCharacter.Character Character;
 
 	private void Awake()
 	{
@@ -32,7 +36,11 @@ public class Bord : MonoBehaviour
 		LastPos = transform.position;
 	}
 
-	private bool grounded = true;
+	public void OnSpawn()
+	{
+		Character = FindObjectOfType<NaughtyCharacter.Character>();
+	}
+
 	void Update()
     {
 		var current =  GetComponent<NaughtyCharacter.Character>().IsGrounded;
@@ -70,7 +78,7 @@ public class Bord : MonoBehaviour
 				Followee.Chirp();
 			}
 
-			GetComponentInChildren<Punchable>().Punch();
+			Player.GetComponentInChildren<Punchable>().Punch();
 
 			// Check for close objects with tags
 			GameObject obj = FindClosestEnemy();
@@ -134,15 +142,5 @@ public class Bord : MonoBehaviour
 			Cursor.lockState = CursorLockMode.None;
 			Win.SetActive( true );
 		}
-	}
-
-	public void Footstep()
-	{
-		StaticHelpers.SpawnResourceAudioSource( "footstep", transform.position, Random.Range( 0.8f, 1.2f ), 0.2f );
-	}
-
-	public void Flap()
-	{
-		StaticHelpers.SpawnResourceAudioSource( "flap" + Random.Range( 1, 4 ), transform.position, Random.Range( 0.8f, 1.2f ), 0.5f );
 	}
 }
