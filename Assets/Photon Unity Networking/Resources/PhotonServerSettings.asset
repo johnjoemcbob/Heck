@@ -46,4 +46,6 @@ MonoBehaviour:
   - SendName
   - RequestName
   - SendChat
+  - SendChirp
+  - SendSpawnFollower
   DisableAutoOpenWizard: 1

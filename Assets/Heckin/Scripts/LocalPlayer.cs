@@ -7,13 +7,10 @@ public class LocalPlayer : MonoBehaviour
 {
 	public static LocalPlayer Instance;
 
-	public Transform LastFollower;
 	public GameObject Win;
 
 	public Player Player;
 
-	[HideInInspector]
-	public BordFollower Followee;
 	[HideInInspector]
 	public Vector3 Direction;
 	private Vector3 LastPos;
@@ -27,7 +24,6 @@ public class LocalPlayer : MonoBehaviour
 
 	void Start()
     {
-		LastFollower = transform;
 		UpdateText();
 
 		Cursor.visible = false;
@@ -71,76 +67,21 @@ public class LocalPlayer : MonoBehaviour
 		}
 		if ( Input.GetMouseButtonDown( 0 ) )
 		{
-			// Sound
-			StaticHelpers.SpawnResourceAudioSource( "chirp" + Random.Range( 1, 5 ), transform.position, Random.Range( 0.8f, 1.2f ) );
-			if ( Followee != null )
-			{
-				Followee.Chirp();
-			}
-
-			Player.GetComponentInChildren<Punchable>().Punch();
-
-			// Check for close objects with tags
-			GameObject obj = FindClosestEnemy();
-			if ( obj != null )
-			{
-				// Delete object,
-				Vector3 pos = obj.transform.position;
-				Destroy( obj );
-
-				GameObject par = StaticHelpers.EmitParticleDust( obj.transform.position );
-				par.transform.localScale *= 2;
-
-				// Spawn follower at object, and follow last
-				GameObject follower = Instantiate( Resources.Load( "Prefabs/BordFollower" ) ) as GameObject;
-				follower.transform.position = pos;
-				follower.GetComponent<BordFollower>().ToFollow = LastFollower;
-				if ( Followee != null && LastFollower != null && LastFollower.GetComponent<BordFollower>() != null )
-				{
-					LastFollower.GetComponent<BordFollower>().Followee = follower.GetComponent<BordFollower>();
-				}
-				LastFollower = follower.transform;
-				if ( Followee == null )
-				{
-					Followee = LastFollower.GetComponent<BordFollower>();
-				}
-
-				UpdateText();
-			}
+			Player.ChirpLocal();
 		}
     }
 
-	public GameObject FindClosestEnemy()
-	{
-		GameObject[] gos;
-		gos = GameObject.FindGameObjectsWithTag( "Enemy" );
-		GameObject closest = null;
-		float distance = Mathf.Infinity;
-		Vector3 position = transform.position;
-		foreach ( GameObject go in gos )
-		{
-			Vector3 diff = go.transform.position - position;
-			float curDistance = diff.sqrMagnitude;
-			if ( curDistance < distance && curDistance < 15 )
-			{
-				closest = go;
-				distance = curDistance;
-			}
-		}
-		return closest;
-	}
-
 	void UpdateText()
 	{
-		var count = GameObject.FindGameObjectsWithTag( "Enemy" ).Length;
-		FindObjectsOfType<Text>()[1].text = count + " cars remaining";
+		//var count = GameObject.FindGameObjectsWithTag( "Enemy" ).Length;
+		//FindObjectsOfType<Text>()[1].text = count + " cars remaining";
 
-		if ( count <= 4 )
-		{
-			// TODO WIN
-			Cursor.visible = true;
-			Cursor.lockState = CursorLockMode.None;
-			Win.SetActive( true );
-		}
+		//if ( count <= 4 )
+		//{
+		//	// TODO WIN
+		//	Cursor.visible = true;
+		//	Cursor.lockState = CursorLockMode.None;
+		//	Win.SetActive( true );
+		//}
 	}
 }

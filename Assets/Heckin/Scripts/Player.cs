@@ -15,9 +15,16 @@ public class Player : PunBehaviour
 
 	private PhotonView PhotonView;
 
-    void Awake()
+	[HideInInspector]
+	public Transform LastFollower;
+	[HideInInspector]
+	public BordFollower Followee;
+
+	void Awake()
     {
 		PhotonView = GetComponent<PhotonView>();
+
+		LastFollower = transform;
 	}
 
 	public void OnJoined()
@@ -51,6 +58,89 @@ public class Player : PunBehaviour
 	void UpdateUI()
 	{
 		//NameTag.text = Name;
+	}
+
+	public void ChirpLocal()
+	{
+		// Sound
+		StaticHelpers.SpawnResourceAudioSource( "chirp" + Random.Range( 3, 5 ), transform.position, Random.Range( 0.8f, 1.2f ) );
+		if ( Followee != null )
+		{
+			Followee.Chirp();
+		}
+
+		GetComponentInChildren<Punchable>().Punch();
+
+		// Check for close objects with tags
+		GameObject obj = FindClosestEnemy();
+		if ( obj != null )
+		{
+			// Delete object,
+			Vector3 pos = obj.transform.position;
+			Destroy( obj );
+
+			PhotonView.RPC( "SendSpawnFollower", PhotonTargets.All, pos );
+		}
+		Chirp( obj != null );
+	}
+
+	[PunRPC]
+	public void SendSpawnFollower( Vector3 pos )
+	{
+		GameObject par = StaticHelpers.EmitParticleDust( pos );
+		par.transform.localScale *= 2;
+
+		// Spawn follower at object, and follow last
+		GameObject follower = Instantiate( Resources.Load( "Prefabs/BordFollower" ) ) as GameObject;
+		follower.transform.position = pos;
+		follower.GetComponent<BordFollower>().ToFollow = LastFollower;
+		if ( Followee != null && LastFollower != null && LastFollower.GetComponent<BordFollower>() != null )
+		{
+			LastFollower.GetComponent<BordFollower>().Followee = follower.GetComponent<BordFollower>();
+		}
+		LastFollower = follower.transform;
+		if ( Followee == null )
+		{
+			Followee = LastFollower.GetComponent<BordFollower>();
+		}
+	}
+
+	public GameObject FindClosestEnemy()
+	{
+		GameObject[] gos;
+		gos = GameObject.FindGameObjectsWithTag( "Enemy" );
+		GameObject closest = null;
+		float distance = Mathf.Infinity;
+		Vector3 position = transform.position;
+		foreach ( GameObject go in gos )
+		{
+			Vector3 diff = go.transform.position - position;
+			float curDistance = diff.sqrMagnitude;
+			if ( curDistance < distance && curDistance < 15 )
+			{
+				closest = go;
+				distance = curDistance;
+			}
+		}
+		return closest;
+	}
+
+	public void Chirp( bool addfollower )
+	{
+		PhotonView.RPC( "SendChirp", PhotonTargets.Others, addfollower );
+	}
+
+	[PunRPC]
+	void SendChirp( bool addfollower )
+	{
+		// Sound
+		StaticHelpers.SpawnResourceAudioSource( "chirp" + Random.Range( 1, 5 ), transform.position, Random.Range( 0.8f, 1.2f ) );
+		//if ( Followee != null )
+		//{
+		//	Followee.Chirp();
+		//}
+
+		GetComponentInChildren<Punchable>().Punch();
 	}
 
 	#region Animation Events

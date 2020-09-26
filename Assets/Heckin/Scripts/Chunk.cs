@@ -187,6 +187,7 @@ public class Chunk : MonoBehaviour
 				break;
 			}
 		}
+		LocalPlayer.Instance.Player.transform.parent = LastPlayerChunk.transform;
 
 		yield break;
 	}

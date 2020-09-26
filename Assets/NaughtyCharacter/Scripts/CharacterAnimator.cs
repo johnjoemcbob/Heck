@@ -46,9 +46,9 @@ namespace NaughtyCharacter
 				float speed = Vector3.Dot( movementVector.normalized, transform.forward );
 
 				_animator.SetFloat( CharacterAnimatorParamId.HorizontalSpeed, speed );
-				_animator.SetFloat( CharacterAnimatorParamId.VerticalSpeed, 0 );
+				_animator.SetFloat( CharacterAnimatorParamId.VerticalSpeed, transform.position.y > 0.2f ? 1 : 0 );
 
-				_animator.SetBool( CharacterAnimatorParamId.IsGrounded, true );
+				_animator.SetBool( CharacterAnimatorParamId.IsGrounded, transform.position.y < 0.2f );
 
 				m_LastPosition = Vector3.Lerp( m_LastPosition, transform.position, Time.deltaTime * 10000 );
 			}
