@@ -9,13 +9,37 @@ public class Chunk : MonoBehaviour
 
 	public static Chunk LastPlayerChunk;
 	public static List<Chunk> Chunks = new List<Chunk>();
+	public static bool Initialised = false;
 
 	public Vector2 Pos;
+	public GameObject[] Blocks;
 
 	private static float timesx = 0;
 	private static float timesy = 0;
 	private static float tempcooldown = 0;
 	private static Vector2 CachedMoveDir;
+
+	private void Start()
+	{
+		if ( !Initialised )
+		{
+			Random.InitState( 0 );
+			Initialised = true;
+		}
+
+		var which = Random.Range( 0, Blocks.Length );
+		foreach ( var block in Blocks )
+		{
+			if ( block.transform.GetSiblingIndex() != which )
+			{
+				Destroy( block );
+			}
+			else
+			{
+				block.SetActive( true );
+			}
+		}
+	}
 
 	private void OnTriggerEnter( Collider other )
 	{
@@ -187,7 +211,10 @@ public class Chunk : MonoBehaviour
 				break;
 			}
 		}
-		LocalPlayer.Instance.Player.transform.parent = LastPlayerChunk.transform;
+		if ( LocalPlayer.Instance.Player != null )
+		{
+			LocalPlayer.Instance.Player.transform.parent = LastPlayerChunk.transform;
+		}
 
 		yield break;
 	}

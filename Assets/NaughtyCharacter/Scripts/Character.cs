@@ -170,6 +170,12 @@ namespace NaughtyCharacter
 
 		private void UpdateVerticalSpeed()
 		{
+			// TEMP
+			//if ( _jumpInput )
+			//{
+			//	_verticalSpeed = MovementSettings.JumpSpeed;
+			//	IsGrounded = false;
+			//}
 			if (IsGrounded)
 			{
 				_verticalSpeed = -GravitySettings.GroundedGravity;

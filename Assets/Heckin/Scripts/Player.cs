@@ -63,7 +63,7 @@ public class Player : PunBehaviour
 	public void ChirpLocal()
 	{
 		// Sound
-		StaticHelpers.SpawnResourceAudioSource( "chirp" + Random.Range( 3, 5 ), transform.position, Random.Range( 0.8f, 1.2f ) );
+		StaticHelpers.GetOrCreateCachedAudioSource( "chirp" + Random.Range( 3, 5 ), transform.position, Random.Range( 0.8f, 1.2f ), 1, 0, true );
 		if ( Followee != null )
 		{
 			Followee.Chirp();
@@ -134,7 +134,7 @@ public class Player : PunBehaviour
 	void SendChirp( bool addfollower )
 	{
 		// Sound
-		StaticHelpers.SpawnResourceAudioSource( "chirp" + Random.Range( 3, 5 ), transform.position, Random.Range( 0.8f, 1.2f ) );
+		StaticHelpers.GetOrCreateCachedAudioSource( "chirp" + Random.Range( 3, 5 ), transform.position, Random.Range( 0.8f, 1.2f ), 1, 0, true );
 		if ( Followee != null )
 		{
 			Followee.Chirp();
@@ -146,12 +146,12 @@ public class Player : PunBehaviour
 	#region Animation Events
 	public void Footstep()
 	{
-		StaticHelpers.SpawnResourceAudioSource( "footstep", transform.position, Random.Range( 0.8f, 1.2f ), 0.2f );
+		StaticHelpers.GetOrCreateCachedAudioSource( "footstep", transform.position, Random.Range( 0.8f, 1.2f ), 0.2f, 0, true );
 	}
 
 	public void Flap()
 	{
-		StaticHelpers.SpawnResourceAudioSource( "flap" + Random.Range( 1, 4 ), transform.position, Random.Range( 0.8f, 1.2f ), 0.5f );
+		StaticHelpers.GetOrCreateCachedAudioSource( "flap" + Random.Range( 1, 4 ), transform.position, Random.Range( 0.8f, 1.2f ), 0.5f );
 	}
 	#endregion
 }

@@ -36,12 +36,12 @@ public class BordFollower : MonoBehaviour
 
 	public void Footstep()
 	{
-		StaticHelpers.SpawnResourceAudioSource( "footstep", transform.position, Random.Range( 0.8f, 1.2f ), 0.05f );
+		//StaticHelpers.GetOrCreateCachedAudioSource( "footstep", transform.position, Random.Range( 0.8f, 1.2f ), 0.05f );
 	}
 
 	public void Flap()
 	{
-		StaticHelpers.SpawnResourceAudioSource( "flap" + Random.Range( 1, 4 ), transform.position, Random.Range( 0.8f, 1.2f ), 0.25f );
+		//StaticHelpers.GetOrCreateCachedAudioSource( "flap" + Random.Range( 1, 4 ), transform.position, Random.Range( 0.8f, 1.2f ), 0.25f );
 	}
 
 	public void Chirp()
@@ -53,7 +53,7 @@ public class BordFollower : MonoBehaviour
 	{
 		yield return new WaitForSeconds( Random.Range( 0.1f, 0.2f ) / 2 );
 
-		StaticHelpers.SpawnResourceAudioSource( "chirp" + Random.Range( 3, 5 ), transform.position, Random.Range( 0.8f, 1.2f ), 0.5f );
+		StaticHelpers.GetOrCreateCachedAudioSource( "chirp" + Random.Range( 3, 5 ), transform.position, Random.Range( 0.8f, 1.2f ), 0.5f );
 		GetComponentInChildren<Punchable>().Punch();
 
 		yield return new WaitForSeconds( Random.Range( 0.1f, 0.2f ) / 2 );

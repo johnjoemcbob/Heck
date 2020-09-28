@@ -39,6 +39,8 @@ public class LocalPlayer : MonoBehaviour
 
 	void Update()
     {
+		if ( Player == null ) return;
+
 		var current =  GetComponent<NaughtyCharacter.Character>().IsGrounded;
 		if ( !grounded && current )
 		{
