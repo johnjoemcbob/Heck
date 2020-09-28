@@ -11,7 +11,6 @@ public class BordFollower : MonoBehaviour
 
 	private void Awake()
 	{
-		_animator = GetComponent<Animator>();
 		transform.localScale = Vector3.one * 20 / 100.0f;
 	}
 
@@ -34,14 +33,18 @@ public class BordFollower : MonoBehaviour
 		_animator.SetBool( "IsGrounded", ( transform.position.y < 0.1f ) );
 	}
 
-	public void Footstep()
+	public void SetAnimal( Player.Animal anim )
 	{
-		//StaticHelpers.GetOrCreateCachedAudioSource( "footstep", transform.position, Random.Range( 0.8f, 1.2f ), 0.05f );
-	}
+		foreach ( Transform child in transform )
+		{
+			if ( child.GetSiblingIndex() != (int) anim )
+			{
+				child.gameObject.SetActive( false );
+				Destroy( child.gameObject );
+			}
+		}
 
-	public void Flap()
-	{
-		//StaticHelpers.GetOrCreateCachedAudioSource( "flap" + Random.Range( 1, 4 ), transform.position, Random.Range( 0.8f, 1.2f ), 0.25f );
+		_animator = GetComponentInChildren<Animator>();
 	}
 
 	public void Chirp()

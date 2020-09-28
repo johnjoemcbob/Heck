@@ -35,6 +35,8 @@ public class LocalPlayer : MonoBehaviour
 	public void OnSpawn()
 	{
 		Character = FindObjectOfType<NaughtyCharacter.Character>();
+
+		Player.SetAnimal( Player.Animal.Chick );
 	}
 
 	void Update()
@@ -54,6 +56,10 @@ public class LocalPlayer : MonoBehaviour
 			LastPos = transform.position;
 		}
 
+		if ( Input.GetKeyDown( KeyCode.F2 ) )
+		{
+			Player.NextAnimal();
+		}
 		if ( Input.GetKeyDown( KeyCode.Escape ) )
 		{
 			if ( Cursor.visible )

@@ -12,6 +12,7 @@ public class Player : PunBehaviour
 
 	[Header( "References" )]
 	public Text NameTag;
+	public GameObject[] Animals;
 
 	private PhotonView PhotonView;
 
@@ -20,17 +21,38 @@ public class Player : PunBehaviour
 	[HideInInspector]
 	public BordFollower Followee;
 
+	public enum Animal
+	{
+		Chick,
+		Parrot,
+		Duck,
+		Hen,
+		Crow,
+		Hornbill,
+		Owl,
+		Flamingo,
+		Ostrich,
+		Count
+	}
+	Animal CurrentAnimal;
+
 	void Awake()
     {
 		PhotonView = GetComponent<PhotonView>();
 
 		LastFollower = transform;
+
+		// Select first animal
+		foreach ( var anim in Animals )
+		{
+			anim.SetActive( false );
+		}
 	}
 
 	public void OnJoined()
 	{
-		// Request names from other players
-		PhotonView.RPC( "RequestName", PhotonTargets.Others, photonView.viewID );
+		// Request sync from other players on late join
+		PhotonView.RPC( "RequestSync", PhotonTargets.Others, photonView.viewID );
 	}
 
 	public void SetName( string name )
@@ -49,10 +71,10 @@ public class Player : PunBehaviour
 	}
 
 	[PunRPC]
-	void RequestName( int viewID )
+	void RequestSync( int viewID )
 	{
 		// Send my name directly back to the player who requested the info
-		LocalPlayer.Instance.Player.photonView.RPC( "SendName", PhotonPlayer.Find( photonView.viewID ), LocalPlayer.Instance.Player.Name );
+		LocalPlayer.Instance.Player.photonView.RPC( "SendAnimal", PhotonPlayer.Find( photonView.viewID ), LocalPlayer.Instance.Player.CurrentAnimal );
 	}
 
 	void UpdateUI()
@@ -79,13 +101,13 @@ public class Player : PunBehaviour
 			Vector3 pos = obj.transform.position;
 			Destroy( obj );
 
-			PhotonView.RPC( "SendSpawnFollower", PhotonTargets.All, pos );
+			PhotonView.RPC( "SendSpawnFollower", PhotonTargets.All, pos, CurrentAnimal );
 		}
 		Chirp( obj != null );
 	}
 
 	[PunRPC]
-	public void SendSpawnFollower( Vector3 pos )
+	public void SendSpawnFollower( Vector3 pos, Animal animal )
 	{
 		GameObject par = StaticHelpers.EmitParticleDust( pos );
 		par.transform.localScale *= 2;
@@ -94,6 +116,7 @@ public class Player : PunBehaviour
 		GameObject follower = Instantiate( Resources.Load( "Prefabs/BordFollower" ) ) as GameObject;
 		follower.transform.position = pos;
 		follower.GetComponent<BordFollower>().ToFollow = LastFollower;
+		follower.GetComponent<BordFollower>().SetAnimal( animal );
 		if ( Followee != null && LastFollower != null && LastFollower.GetComponent<BordFollower>() != null )
 		{
 			LastFollower.GetComponent<BordFollower>().Followee = follower.GetComponent<BordFollower>();
@@ -143,15 +166,33 @@ public class Player : PunBehaviour
 		GetComponentInChildren<Punchable>().Punch();
 	}
 
-	#region Animation Events
-	public void Footstep()
+	public void NextAnimal()
 	{
-		StaticHelpers.GetOrCreateCachedAudioSource( "footstep", transform.position, Random.Range( 0.8f, 1.2f ), 0.2f, 0, true );
+		var anim = CurrentAnimal + 1;
+		if ( anim == Animal.Count )
+		{
+			anim = Animal.Chick;
+		}
+		SetAnimal( anim );
 	}
 
-	public void Flap()
+	public void SetAnimal( Animal anim, bool fromremote = false )
 	{
-		StaticHelpers.GetOrCreateCachedAudioSource( "flap" + Random.Range( 1, 4 ), transform.position, Random.Range( 0.8f, 1.2f ), 0.5f );
+		if ( !fromremote )
+		{
+			PhotonView.RPC( "SendAnimal", PhotonTargets.Others, anim );
+		}
+
+		Animals[(int) CurrentAnimal].SetActive( false );
+		CurrentAnimal = anim;
+		Animals[(int) CurrentAnimal].SetActive( true );
+
+		GetComponent<NaughtyCharacter.CharacterAnimator>().UpdateAnimal();
 	}
-	#endregion
+
+	[PunRPC]
+	void SendAnimal( Animal anim )
+	{
+		SetAnimal( anim, true );
+	}
 }

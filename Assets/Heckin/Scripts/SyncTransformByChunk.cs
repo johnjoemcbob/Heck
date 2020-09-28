@@ -26,7 +26,7 @@ public class SyncTransformByChunk : Photon.MonoBehaviour
 	{
 		if ( stream.isWriting )
 		{
-			stream.SendNext( transform.parent.name );
+			stream.SendNext( transform.parent ? transform.parent.name : "Park" );
 			stream.SendNext( transform.localPosition );
 			stream.SendNext( transform.localRotation );
 		}
@@ -36,7 +36,7 @@ public class SyncTransformByChunk : Photon.MonoBehaviour
 			this.realPosition = (Vector3) stream.ReceiveNext();
 			this.realRotation = (Quaternion) stream.ReceiveNext();
 
-			// TODO parent here!
+			// Parent here
 			Debug.Log( "Receive parent of other; " + this.parentName );
 			transform.parent = GameObject.Find( this.parentName ).transform;
 		}

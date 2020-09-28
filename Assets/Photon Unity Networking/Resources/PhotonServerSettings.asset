@@ -48,4 +48,6 @@ MonoBehaviour:
   - SendChat
   - SendChirp
   - SendSpawnFollower
+  - SendAnimal
+  - RequestSync
   DisableAutoOpenWizard: 1

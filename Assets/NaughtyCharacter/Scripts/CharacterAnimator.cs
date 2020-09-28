@@ -19,9 +19,10 @@ namespace NaughtyCharacter
 
 		private void Awake()
 		{
-			_animator = GetComponent<Animator>();
 			_controller = GetComponent<CharacterController>();
 			//_character = GetComponent<Character>();
+
+			UpdateAnimal();
 		}
 
 		public void Update()
@@ -52,6 +53,12 @@ namespace NaughtyCharacter
 
 				m_LastPosition = Vector3.Lerp( m_LastPosition, transform.position, Time.deltaTime * 10000 );
 			}
+		}
+
+		public void UpdateAnimal()
+		{
+			// Find the enabled animator and link it here
+			_animator = GetComponentInChildren<Animator>();
 		}
 	}
 }
