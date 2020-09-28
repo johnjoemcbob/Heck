@@ -7,20 +7,6 @@ using ExitGames.Client.Photon;
 
 public class Player : PunBehaviour
 {
-	[Header( "Variables" )]
-	public string Name;
-
-	[Header( "References" )]
-	public Text NameTag;
-	public GameObject[] Animals;
-
-	private PhotonView PhotonView;
-
-	[HideInInspector]
-	public Transform LastFollower;
-	[HideInInspector]
-	public BordFollower Followee;
-
 	public enum Animal
 	{
 		Chick,
@@ -34,7 +20,22 @@ public class Player : PunBehaviour
 		Ostrich,
 		Count
 	}
-	Animal CurrentAnimal;
+
+	[Header( "Variables" )]
+	public string Name;
+
+	[Header( "References" )]
+	public Text NameTag;
+	public GameObject[] Animals;
+
+	private PhotonView PhotonView;
+
+	[HideInInspector]
+	public Transform LastFollower;
+	[HideInInspector]
+	public BordFollower Followee;
+	[HideInInspector]
+	public Animal CurrentAnimal;
 
 	void Awake()
     {
@@ -82,10 +83,12 @@ public class Player : PunBehaviour
 		//NameTag.text = Name;
 	}
 
-	public void ChirpLocal()
+	public void ChirpLocal( bool force = false )
 	{
+		if ( Game.Instance.CurrentState != Game.State.Play && !force ) return;
+
 		// Sound
-		StaticHelpers.GetOrCreateCachedAudioSource( "chirp" + Random.Range( 3, 5 ), transform.position, Random.Range( 0.8f, 1.2f ), 1, 0, true );
+		StaticHelpers.GetOrCreateCachedAudioSource( GetClipForAnimal( CurrentAnimal ), transform, Random.Range( 0.8f, 1.2f ), 1, 0, true );
 		if ( Followee != null )
 		{
 			Followee.Chirp();
@@ -157,7 +160,7 @@ public class Player : PunBehaviour
 	void SendChirp( bool addfollower )
 	{
 		// Sound
-		StaticHelpers.GetOrCreateCachedAudioSource( "chirp" + Random.Range( 3, 5 ), transform.position, Random.Range( 0.8f, 1.2f ), 1, 0, true );
+		StaticHelpers.GetOrCreateCachedAudioSource( GetClipForAnimal( CurrentAnimal ), transform, Random.Range( 0.8f, 1.2f ), 1, 0, true );
 		if ( Followee != null )
 		{
 			Followee.Chirp();
@@ -194,5 +197,40 @@ public class Player : PunBehaviour
 	void SendAnimal( Animal anim )
 	{
 		SetAnimal( anim, true );
+	}
+
+	public static string GetClipForAnimal( Animal anim )
+	{
+		var clip = "chirp" + Random.Range( 3, 5 );
+		{
+			switch ( anim )
+			{
+				case Animal.Chick:
+					break;
+				case Animal.Parrot:
+					break;
+				case Animal.Duck:
+					break;
+				case Animal.Hen:
+					break;
+				case Animal.Crow:
+					clip = "craw" + Random.Range( 1, 4 );
+					break;
+				case Animal.Hornbill:
+					break;
+				case Animal.Owl:
+					clip = "hoothoot" + Random.Range( 3, 4 );
+					break;
+				case Animal.Flamingo:
+					break;
+				case Animal.Ostrich:
+					break;
+				case Animal.Count:
+					break;
+				default:
+					break;
+			}
+		}
+		return clip;
 	}
 }

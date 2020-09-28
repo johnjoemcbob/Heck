@@ -117,6 +117,13 @@ public class StaticHelpers
 	//	src.spatialBlend = 0;
 	//	return src;
 	//}
+	public static AudioSource GetOrCreateCachedAudioSource( string clipname, Transform parent, float pitch = 1, float volume = 1, float delay = 0, bool force = false )
+	{
+		var src = GetOrCreateCachedAudioSource( GetOrLoadAudioClip( clipname ), Vector3.zero, pitch, volume, delay, force );
+		src.transform.parent = parent;
+		src.transform.localPosition = Vector3.zero;
+		return src;
+	}
 	public static AudioSource GetOrCreateCachedAudioSource( string clipname, Vector3 pos, float pitch = 1, float volume = 1, float delay = 0, bool force = false )
 	{
 		return GetOrCreateCachedAudioSource( GetOrLoadAudioClip( clipname ), pos, pitch, volume, delay, force );
@@ -167,6 +174,7 @@ public class StaticHelpers
 			// Update prefab if found
 			if ( source != null )
 			{
+				source.transform.parent = Game.RuntimeParent;
 				source.transform.position = pos;
 
 				source.clip = clip;

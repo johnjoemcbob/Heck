@@ -22,10 +22,10 @@ public class PhotonPlayerCreator : MonoBehaviour
 		}
 
 		//Camera.Target = newPlayerObject.transform;
-		var character = FindObjectOfType<NaughtyCharacter.Character>();
-		character._characterController = newPlayerObject.GetComponentInChildren<CharacterController>();
-		character._characterAnimator = newPlayerObject.GetComponentInChildren<NaughtyCharacter.CharacterAnimator>();
-		newPlayerObject.GetComponentInChildren<NaughtyCharacter.CharacterAnimator>()._character = character;
+		var character = FindObjectOfType<NaughtyCharacter.Character>( true );
+		character._characterController = newPlayerObject.GetComponentInChildren<CharacterController>( true );
+		character._characterAnimator = newPlayerObject.GetComponentInChildren<NaughtyCharacter.CharacterAnimator>( true );
+		newPlayerObject.GetComponentInChildren<NaughtyCharacter.CharacterAnimator>( true )._character = character;
 		character.transform.SetParent( newPlayerObject.transform );
 		character.transform.localPosition = Vector3.zero;
 	}

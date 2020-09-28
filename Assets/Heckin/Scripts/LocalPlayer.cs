@@ -7,7 +7,7 @@ public class LocalPlayer : MonoBehaviour
 {
 	public static LocalPlayer Instance;
 
-	public GameObject Win;
+	public GameObject Camera;
 
 	public Player Player;
 
@@ -25,9 +25,6 @@ public class LocalPlayer : MonoBehaviour
 	void Start()
     {
 		UpdateText();
-
-		Cursor.visible = false;
-		Cursor.lockState = CursorLockMode.Locked;
 
 		LastPos = transform.position;
 	}
@@ -60,19 +57,19 @@ public class LocalPlayer : MonoBehaviour
 		{
 			Player.NextAnimal();
 		}
-		if ( Input.GetKeyDown( KeyCode.Escape ) )
-		{
-			if ( Cursor.visible )
-			{
-				Cursor.visible = false;
-				Cursor.lockState = CursorLockMode.Locked;
-			}
-			else
-			{
-				Cursor.visible = true;
-				Cursor.lockState = CursorLockMode.None;
-			}
-		}
+		//if ( Input.GetKeyDown( KeyCode.Escape ) )
+		//{
+		//	if ( Cursor.visible )
+		//	{
+		//		Cursor.visible = false;
+		//		Cursor.lockState = CursorLockMode.Locked;
+		//	}
+		//	else
+		//	{
+		//		Cursor.visible = true;
+		//		Cursor.lockState = CursorLockMode.None;
+		//	}
+		//}
 		if ( Input.GetMouseButtonDown( 0 ) )
 		{
 			Player.ChirpLocal();

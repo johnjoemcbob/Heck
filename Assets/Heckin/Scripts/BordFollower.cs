@@ -8,6 +8,7 @@ public class BordFollower : MonoBehaviour
 	public BordFollower Followee;
 
 	private Animator _animator;
+	private Player.Animal CurrentAnimal;
 
 	private void Awake()
 	{
@@ -35,7 +36,9 @@ public class BordFollower : MonoBehaviour
 
 	public void SetAnimal( Player.Animal anim )
 	{
-		foreach ( Transform child in transform )
+		CurrentAnimal = anim;
+
+		foreach ( Transform child in transform.GetChild( 0 ) )
 		{
 			if ( child.GetSiblingIndex() != (int) anim )
 			{
@@ -56,7 +59,7 @@ public class BordFollower : MonoBehaviour
 	{
 		yield return new WaitForSeconds( Random.Range( 0.1f, 0.2f ) / 2 );
 
-		StaticHelpers.GetOrCreateCachedAudioSource( "chirp" + Random.Range( 3, 5 ), transform.position, Random.Range( 0.8f, 1.2f ), 0.5f );
+		StaticHelpers.GetOrCreateCachedAudioSource( Player.GetClipForAnimal( CurrentAnimal ), transform, Random.Range( 0.8f, 1.2f ), 0.5f );
 		GetComponentInChildren<Punchable>().Punch();
 
 		yield return new WaitForSeconds( Random.Range( 0.1f, 0.2f ) / 2 );
