@@ -34,13 +34,14 @@ public class AnimControllerCreator : MonoBehaviour
 			controller.AddParameter( "HorizontalSpeed", AnimatorControllerParameterType.Float );
 			controller.AddParameter( "VerticalSpeed", AnimatorControllerParameterType.Float );
 			controller.AddParameter( "IsGrounded", AnimatorControllerParameterType.Bool );
+			controller.AddParameter( "Spin", AnimatorControllerParameterType.Trigger );
 
 			// Get motions
 			var assetPath = "Assets/Quirky Series/" + Theme + "/" + Animal + "/Animation/" + Animal + "_Animations.fbx";
 			object[] a = AssetDatabase.LoadAllAssetsAtPath(assetPath);
 
 			List<AnimationClip> animations = new List<AnimationClip>();
-			AnimationClip idle_a = null, run = null, fly = null;
+			AnimationClip idle_a = null, run = null, fly = null, spin = null;
 			foreach ( var obj in a )
 			{
 				AnimationClip anim = obj as AnimationClip;
@@ -58,6 +59,10 @@ public class AnimControllerCreator : MonoBehaviour
 					{
 						fly = anim;
 					}
+					if ( anim.name == "Spin" )
+					{
+						spin = anim;
+					}
 				}
 			}
 
@@ -69,6 +74,8 @@ public class AnimControllerCreator : MonoBehaviour
 			state_run.motion = run;
 			var state_fly = rootStateMachine.AddState( "Fly" );
 			state_fly.motion = fly;
+			var state_spin = rootStateMachine.AddState( "Spin" );
+			state_spin.motion = spin;
 
 			// Idle <-> Run
 			var trans_idle_run = state_idle.AddTransition( state_run );
@@ -97,6 +104,15 @@ public class AnimControllerCreator : MonoBehaviour
 			trans_fly_idle.AddCondition( UnityEditor.Animations.AnimatorConditionMode.If, 0, "IsGrounded" );
 			trans_fly_idle.AddCondition( UnityEditor.Animations.AnimatorConditionMode.Less, 0.01f, "HorizontalSpeed" );
 			trans_fly_idle.duration = 0;
+
+			// Any -> Spin -> Idle
+			var trans_any_spin = rootStateMachine.AddAnyStateTransition( state_spin );
+			trans_any_spin.AddCondition( UnityEditor.Animations.AnimatorConditionMode.If, 0, "Spin" );
+			trans_any_spin.duration = 0;
+
+			var trans_spin_idle = state_spin.AddTransition( state_idle );
+			trans_spin_idle.AddCondition( UnityEditor.Animations.AnimatorConditionMode.If, 0, "Spin" );
+			trans_spin_idle.duration = 0;
 
 			// Add Transitions
 			//var exitTransition = stateA1.AddExitTransition();

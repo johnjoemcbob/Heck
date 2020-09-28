@@ -94,6 +94,10 @@ public class Player : PunBehaviour
 			Followee.Chirp();
 		}
 
+		GameObject par = StaticHelpers.SpawnPrefab( "Particles/ChirpParticle" );
+		par.transform.position = transform.position;
+		par.transform.eulerAngles = transform.eulerAngles;
+
 		GetComponentInChildren<Punchable>().Punch();
 
 		// Check for close objects with tags
@@ -165,6 +169,10 @@ public class Player : PunBehaviour
 		{
 			Followee.Chirp();
 		}
+
+		GameObject par = StaticHelpers.SpawnPrefab( "Particles/ChirpParticle" );
+		par.transform.position = transform.position;
+		par.transform.eulerAngles = transform.eulerAngles;
 
 		GetComponentInChildren<Punchable>().Punch();
 	}

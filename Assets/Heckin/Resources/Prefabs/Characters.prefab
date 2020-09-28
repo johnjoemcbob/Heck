@@ -714,6 +714,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Parrot_LOD0
       objectReference: {fileID: 0}
+    - target: {fileID: 8098324818925796310, guid: 2f35e696e9a735f49b97f53c91345d4e,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 8103753008317092278, guid: 2f35e696e9a735f49b97f53c91345d4e,
         type: 3}
       propertyPath: m_LocalPosition.x

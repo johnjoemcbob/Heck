@@ -66,10 +66,40 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 5450010649930270850}
     m_Modifications:
+    - target: {fileID: 242242566675791903, guid: 7a0d90827c586354e98bd1b02e9fb055,
+        type: 3}
+      propertyPath: Follower
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 610179697737958746, guid: 7a0d90827c586354e98bd1b02e9fb055,
+        type: 3}
+      propertyPath: Follower
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 3541137875736208160, guid: 7a0d90827c586354e98bd1b02e9fb055,
         type: 3}
       propertyPath: m_Name
       value: Characters
+      objectReference: {fileID: 0}
+    - target: {fileID: 4991785128231452822, guid: 7a0d90827c586354e98bd1b02e9fb055,
+        type: 3}
+      propertyPath: Follower
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5296752371005576229, guid: 7a0d90827c586354e98bd1b02e9fb055,
+        type: 3}
+      propertyPath: Follower
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5750225991347351768, guid: 7a0d90827c586354e98bd1b02e9fb055,
+        type: 3}
+      propertyPath: Follower
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6448832767588275353, guid: 7a0d90827c586354e98bd1b02e9fb055,
+        type: 3}
+      propertyPath: Follower
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7009053993023819677, guid: 7a0d90827c586354e98bd1b02e9fb055,
         type: 3}
@@ -125,6 +155,21 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7791349549004327389, guid: 7a0d90827c586354e98bd1b02e9fb055,
+        type: 3}
+      propertyPath: Follower
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8293506773515316202, guid: 7a0d90827c586354e98bd1b02e9fb055,
+        type: 3}
+      propertyPath: Follower
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8346507726439133744, guid: 7a0d90827c586354e98bd1b02e9fb055,
+        type: 3}
+      propertyPath: Follower
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 7a0d90827c586354e98bd1b02e9fb055, type: 3}

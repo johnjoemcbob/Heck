@@ -135,6 +135,17 @@ namespace NaughtyCharacter
 			_jumpInput = jumpInput;
 		}
 
+		public void SetUpVelocity( float set )
+		{
+			IsGrounded = false;
+			_verticalSpeed = set;
+		}
+
+		public void AddUpVelocity( float add )
+		{
+			_verticalSpeed += add;
+		}
+
 		public Vector2 GetControlRotation()
 		{
 			return _controlRotation;
@@ -194,7 +205,13 @@ namespace NaughtyCharacter
 					_verticalSpeed = Mathf.MoveTowards(_verticalSpeed, -GravitySettings.MaxFallSpeed, MovementSettings.JumpAbortSpeed * Time.deltaTime);
 				}
 
-				_verticalSpeed = Mathf.MoveTowards(_verticalSpeed, -GravitySettings.MaxFallSpeed, GravitySettings.Gravity * Time.deltaTime);
+				var gravity = -GravitySettings.MaxFallSpeed;
+				if (_jumpInput)
+				{
+					gravity /= 30;
+				}
+
+				_verticalSpeed = Mathf.MoveTowards(_verticalSpeed, gravity, GravitySettings.Gravity * Time.deltaTime);
 			}
 		}
 

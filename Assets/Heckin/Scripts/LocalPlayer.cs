@@ -15,7 +15,6 @@ public class LocalPlayer : MonoBehaviour
 	public Vector3 Direction;
 	private Vector3 LastPos;
 	private bool grounded = true;
-	private NaughtyCharacter.Character Character;
 
 	private void Awake()
 	{
@@ -31,8 +30,6 @@ public class LocalPlayer : MonoBehaviour
 
 	public void OnSpawn()
 	{
-		Character = FindObjectOfType<NaughtyCharacter.Character>();
-
 		Player.SetAnimal( Player.Animal.Chick );
 	}
 

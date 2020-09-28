@@ -10,10 +10,16 @@ public class StaticHelpers
 	public const int POOL_AUDIO_MAX = 128;
 	public const int POOL_PREFAB_MAX = 24;
 
+	public struct PooledAudio
+	{
+		public AudioSource Source;
+		public float Time;
+	}
+
 	#region ==Variables
 	public static Dictionary<string, AudioClip> AudioClips = new Dictionary<string, AudioClip>();
 
-	public static Dictionary<AudioSource, float> AudioPool = new Dictionary<AudioSource, float>();
+	public static List<PooledAudio> AudioPool = new List<PooledAudio>();
 	public static Dictionary<string, List<GameObject>> PrefabPools = new Dictionary<string, List<GameObject>>();
 	#endregion
 
@@ -120,8 +126,11 @@ public class StaticHelpers
 	public static AudioSource GetOrCreateCachedAudioSource( string clipname, Transform parent, float pitch = 1, float volume = 1, float delay = 0, bool force = false )
 	{
 		var src = GetOrCreateCachedAudioSource( GetOrLoadAudioClip( clipname ), Vector3.zero, pitch, volume, delay, force );
-		src.transform.parent = parent;
-		src.transform.localPosition = Vector3.zero;
+		if ( src != null )
+		{
+			src.transform.parent = parent;
+			src.transform.localPosition = Vector3.zero;
+		}
 		return src;
 	}
 	public static AudioSource GetOrCreateCachedAudioSource( string clipname, Vector3 pos, float pitch = 1, float volume = 1, float delay = 0, bool force = false )
@@ -133,42 +142,67 @@ public class StaticHelpers
 		AudioSource source = null;
 		{
 			// Search prefabs for any disabled which are usable
+			var toremove = new List<PooledAudio>();
+			int index = 0;
 			foreach ( var cached in AudioPool )
 			{
-				if ( cached.Key != null && !cached.Key.gameObject.activeSelf )
+				if ( cached.Source == null )
 				{
-					source = cached.Key;
-					source.gameObject.SetActive( true );
-					AudioPool[cached.Key] = Time.time;
-					break;
+					toremove.Add( cached );
 				}
+				else
+				{
+					float percent = ( Time.time - cached.Time ) / cached.Source.clip.length;
+					if ( percent >= 1 )
+					{
+						source = cached.Source;
+						source.gameObject.SetActive( true );
+						break;
+					}
+				}
+				index++;
+			}
+			if ( source != null )
+			{
+				var local = AudioPool[index];
+				local.Time = Time.time;
+				AudioPool[index] = local;
+			}
+			foreach ( var remove in toremove )
+			{
+				AudioPool.Remove( remove );
 			}
 
 			// Couldn't find any, but still have space in the pool
-			if ( source == null && AudioPool.Count < POOL_PREFAB_MAX )
+			if ( source == null && AudioPool.Count < POOL_AUDIO_MAX )
 			{
 				source = SpawnAudioSource( clip );
 
-				AudioPool.Add( source, Time.time );
+				var pooled = new PooledAudio();
+				{
+					pooled.Source = source;
+					pooled.Time = Time.time;
+				}
+				AudioPool.Add( pooled );
 			}
 
 			// None found and is forced priority
-			if ( source == null && force )
+			if ( source == null )// && force )
 			{
 				// Find oldeset audiosource
-				AudioSource oldest = null;
+				PooledAudio oldest = new PooledAudio();
 				float maxpercent = 0;
 				foreach ( var src in AudioPool )
 				{
-					float percent = 1 - ( Time.time - src.Value ) / src.Key.clip.length;
+					float percent = 1 - ( Time.time - src.Time ) / src.Source.clip.length;
 					if ( percent > maxpercent )
 					{
-						oldest = src.Key;
+						oldest = src;
 						maxpercent = percent;
 					}
 				}
-				source = oldest;
-				AudioPool[oldest] = Time.time;
+				source = oldest.Source;
+				oldest.Time = Time.time;
 			}
 
 			// Update prefab if found
@@ -183,10 +217,10 @@ public class StaticHelpers
 				source.spatialBlend = 1;
 				source.PlayDelayed( delay );
 
-				if ( Game.Instance != null )
-				{
-					Game.Instance.StartCoroutine( DisableAfterTimeout( source.gameObject, delay + clip.length + 0.1f ) );
-				}
+				//if ( Game.Instance != null )
+				//{
+				//	Game.Instance.StartCoroutine( DisableAfterTimeout( source.gameObject, delay + clip.length + 0.1f ) );
+				//}
 			}
 		}
 		return source;
@@ -208,7 +242,7 @@ public class StaticHelpers
 	public static void Reset()
 	{
 		// Reset static pools
-		AudioPool = new Dictionary<AudioSource, float>();
+		AudioPool = new List<PooledAudio>();
 		PrefabPools = new Dictionary<string, List<GameObject>>();
 	}
 	#endregion

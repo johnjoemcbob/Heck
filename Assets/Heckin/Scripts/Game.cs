@@ -72,11 +72,7 @@ public class Game : MonoBehaviour
 				Cursor.lockState = CursorLockMode.None;
 				break;
 			case State.CharacterSelect:
-				foreach ( Transform child in SelectableCharacters )
-				{
-					child.gameObject.SetActive( false );
-				}
-				SelectableCharacters.GetChild( 0 ).gameObject.SetActive( true );
+				LoopCharacterSelect( 0 );
 				break;
 			case State.TitleToPlay:
 				TitleCamera.Instance.LerpStartTime = Time.time;
@@ -157,7 +153,7 @@ public class Game : MonoBehaviour
 	#region Buttons
 	public void ButtonGo()
 	{
-		SwitchState( State.CharacterSelect );
+		StartCoroutine( Co_JoinGame() );
 	}
 
 	public void ButtonPlay()
@@ -180,6 +176,16 @@ public class Game : MonoBehaviour
 		Application.OpenURL( "www.johnjoemcbob.com" );
 	}
 	#endregion
+
+	IEnumerator Co_JoinGame()
+	{
+		while ( !LocalPlayer.Instance || !LocalPlayer.Instance.Player )
+		{
+			yield return new WaitForEndOfFrame();
+		}
+
+		SwitchState( State.CharacterSelect );
+	}
 
 	void LoopCharacterSelect( int dir )
 	{
@@ -204,6 +210,6 @@ public class Game : MonoBehaviour
 			child.gameObject.SetActive( false );
 		}
 		SelectableCharacters.GetChild( (int) anim ).gameObject.SetActive( true );
-
+		SelectableCharacters.GetChild( (int) anim ).GetComponentInChildren<Animator>().SetBool( "Spin", true );
 	}
 }
