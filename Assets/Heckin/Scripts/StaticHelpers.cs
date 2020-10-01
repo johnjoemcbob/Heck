@@ -152,8 +152,9 @@ public class StaticHelpers
 				}
 				else
 				{
-					float percent = ( Time.time - cached.Time ) / cached.Source.clip.length;
-					if ( percent >= 1 )
+					//float percent = ( Time.time - cached.Time ) / cached.Source.clip.length;
+					//if ( percent >= 1 )
+					if ( !cached.Source.isPlaying )
 					{
 						source = cached.Source;
 						source.gameObject.SetActive( true );
@@ -192,17 +193,21 @@ public class StaticHelpers
 				// Find oldeset audiosource
 				PooledAudio oldest = new PooledAudio();
 				float maxpercent = 0;
-				foreach ( var src in AudioPool )
+				index = 0;
+				for ( int ind = 0; ind < AudioPool.Count; ind++ )
 				{
+					PooledAudio src = AudioPool[ind];
 					float percent = 1 - ( Time.time - src.Time ) / src.Source.clip.length;
 					if ( percent > maxpercent )
 					{
 						oldest = src;
 						maxpercent = percent;
+						index = ind;
 					}
 				}
 				source = oldest.Source;
 				oldest.Time = Time.time;
+				AudioPool[index] = oldest;
 			}
 
 			// Update prefab if found

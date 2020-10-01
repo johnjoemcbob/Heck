@@ -27,17 +27,13 @@ public class Chunk : MonoBehaviour
 			Initialised = true;
 		}
 
-		var which = Random.Range( 0, Blocks.Length );
-		foreach ( var block in Blocks )
+		if ( Blocks.Length != 0 )
 		{
-			if ( block.transform.GetSiblingIndex() != which )
-			{
-				Destroy( block );
-			}
-			else
-			{
-				block.SetActive( true );
-			}
+			var which = Random.Range( 0, Blocks.Length );
+			GameObject center = Instantiate( Blocks[which], transform.GetChild( 0 ) );
+			center.transform.localPosition = Vector3.zero;
+			center.transform.localEulerAngles = Vector3.zero;
+			center.transform.localScale = Vector3.one;
 		}
 	}
 
@@ -80,6 +76,55 @@ public class Chunk : MonoBehaviour
 	{
 		MoveDir( CachedMoveDir );
 		CachedMoveDir = Vector2.zero;
+	}
+
+	public static Chunk GetNext( Vector2 pos, Vector2 dir )
+	{
+		// First try just normal
+		var target = pos + dir;
+		foreach ( var chunk in Chunks )
+		{
+			if ( chunk.Pos == target )
+			{
+				return chunk;
+			}
+		}
+
+		// Otherwise gotta loop around
+		target = pos - dir * ( 5 - 1 );
+		Debug.Log( "loop test at " + target );
+		foreach ( var chunk in Chunks )
+		{
+			if ( chunk.Pos == target )
+			{
+				return chunk;
+			}
+		}
+		return null;
+	}
+
+	public static Chunk GetOpposite( Chunk trans, bool y = false )
+	{
+		// Get distance from player (center) to this
+		var mid = LastPlayerChunk.Pos;
+		var dir = trans.Pos - mid;
+
+		// Negate it
+		// Find chunk with that pos
+		var opposite = trans;
+		foreach ( var chunk in Chunks )
+		{
+			if ( 
+				( !y && chunk.Pos.x == mid.x - dir.x && chunk.Pos.y == trans.Pos.y ) ||
+				( y && chunk.Pos.y == mid.y - dir.y && chunk.Pos.x == trans.Pos.x )
+			)
+			{
+				opposite = chunk;
+				break;
+			}
+		}
+		Debug.Log( trans.Pos + " opposite is " + opposite.Pos + " (with center " + mid + ")" );
+		return opposite;
 	}
 
 	public static void MoveDir( Vector2 dir )
@@ -214,6 +259,14 @@ public class Chunk : MonoBehaviour
 		if ( LocalPlayer.Instance.Player != null )
 		{
 			LocalPlayer.Instance.Player.transform.parent = LastPlayerChunk.transform;
+
+			// Move this new center to the origin
+			//var dist = LastPlayerChunk.transform.position;
+			//// And move all others by the same distance to ensure stays connected
+			//foreach ( var chunk in Chunks )
+			//{
+			//	chunk.transform.position -= dist;
+			//}
 		}
 
 		yield break;

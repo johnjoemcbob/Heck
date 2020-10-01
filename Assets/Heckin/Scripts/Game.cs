@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Game : MonoBehaviour
 {
@@ -21,9 +22,12 @@ public class Game : MonoBehaviour
 	public GameObject[] StateObjects;
 	public RectTransform TitleLerper;
 	public Transform SelectableCharacters;
+	public GameObject SelectableCharacterLock;
 
 	[HideInInspector]
 	public State CurrentState;
+	[HideInInspector]
+	public bool[] UnlockedCharacters;
 	private float StateStartTime;
 	private Vector2 TitleLerpMin;
 	private Vector2 TitleLerpMax;
@@ -41,6 +45,9 @@ public class Game : MonoBehaviour
 
 		TitleLerpMin = TitleLerper.anchorMin;
 		TitleLerpMax = TitleLerper.anchorMax;
+
+		UnlockedCharacters = new bool[SelectableCharacters.childCount];
+		UnlockedCharacters[0] = true;
 	}
 
 	private void Update()
@@ -99,8 +106,16 @@ public class Game : MonoBehaviour
 		{
 			case State.Title:
 				break;
+			case State.CharacterSelect:
+				var speed = 0.1f;
+				SelectableCharacters.localEulerAngles = new Vector3(
+					2 * Mathf.Sin( Time.time * speed ),
+					180,
+					-10 * Mathf.Cos( Time.time * -speed )
+				);
+				break;
 			case State.TitleToPlay:
-				var speed = 2;
+				speed = 2;
 				var progress = ( Time.time - StateStartTime ) / TRANS_LERP_TIME * speed;
 
 				TitleLerper.anchorMin = Vector2.Lerp( TitleLerpMin, Vector2.zero, progress );
@@ -158,7 +173,10 @@ public class Game : MonoBehaviour
 
 	public void ButtonPlay()
 	{
-		SwitchState( State.TitleToPlay );
+		if ( UnlockedCharacters[(int) LocalPlayer.Instance.Player.CurrentAnimal] )
+		{
+			SwitchState( State.TitleToPlay );
+		}
 	}
 
 	public void ButtonLeft()
@@ -174,6 +192,19 @@ public class Game : MonoBehaviour
 	public void ButtonJohnjoemcbob()
 	{
 		Application.OpenURL( "www.johnjoemcbob.com" );
+	}
+
+	public void ButtonToggleMusic()
+	{
+		var src = GameObject.Find( "Music" ).GetComponent<AudioSource>();
+		if ( src.isPlaying )
+		{
+			src.Pause();
+		}
+		else
+		{
+			src.Play();
+		}
 	}
 	#endregion
 
@@ -211,5 +242,14 @@ public class Game : MonoBehaviour
 		}
 		SelectableCharacters.GetChild( (int) anim ).gameObject.SetActive( true );
 		SelectableCharacters.GetChild( (int) anim ).GetComponentInChildren<Animator>().SetBool( "Spin", true );
+
+		bool unlocked = UnlockedCharacters[(int) LocalPlayer.Instance.Player.CurrentAnimal];
+		SelectableCharacterLock.SetActive( !unlocked );
+		var button = "meen't :(";
+		if ( unlocked )
+		{
+			button = "me!";
+		}
+		GameObject.Find( "Me (Button)" ).GetComponentInChildren<Text>().text = button;
 	}
 }

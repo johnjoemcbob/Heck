@@ -50,4 +50,5 @@ MonoBehaviour:
   - SendSpawnFollower
   - SendAnimal
   - RequestSync
+  - SendEffect
   DisableAutoOpenWizard: 1

@@ -1,4 +1,5 @@
 using UnityEngine;
+using Heck;
 
 namespace NaughtyCharacter
 {
@@ -51,6 +52,8 @@ namespace NaughtyCharacter
 
 	public class Character : MonoBehaviour
 	{
+		public static Character Instance;
+
 		public Controller Controller; // The controller that controls the character
 		public MovementSettings MovementSettings;
 		public GravitySettings GravitySettings;
@@ -78,6 +81,8 @@ namespace NaughtyCharacter
 
 		private void Awake()
 		{
+			Instance = this;
+
 			Controller.Init();
 			Controller.Character = this;
 
@@ -205,13 +210,16 @@ namespace NaughtyCharacter
 					_verticalSpeed = Mathf.MoveTowards(_verticalSpeed, -GravitySettings.MaxFallSpeed, MovementSettings.JumpAbortSpeed * Time.deltaTime);
 				}
 
-				var gravity = -GravitySettings.MaxFallSpeed;
-				if (_jumpInput)
-				{
-					gravity /= 30;
-				}
+				//var gravity = -GravitySettings.MaxFallSpeed;
+				//if (_jumpInput)
+				//{
+				//	gravity /= 30;
+				//}
 
-				_verticalSpeed = Mathf.MoveTowards(_verticalSpeed, gravity, GravitySettings.Gravity * Time.deltaTime);
+				//_verticalSpeed = Mathf.MoveTowards(_verticalSpeed, gravity, GravitySettings.Gravity * Time.deltaTime);
+
+				var gravity = ( UnlockManager.Get( typeof(UnlockableGlide) ) as UnlockableGlide ).Try( _jumpInput, -GravitySettings.MaxFallSpeed );
+				_verticalSpeed = Mathf.MoveTowards( _verticalSpeed, gravity, GravitySettings.Gravity * Time.deltaTime );
 			}
 		}
 
