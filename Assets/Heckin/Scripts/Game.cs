@@ -19,10 +19,15 @@ public class Game : MonoBehaviour
 	public static Game Instance;
 	public static Transform RuntimeParent;
 
+	[Header( "Variables" )]
+	public string[] CharacterNames;
+
+	[Header( "References" )]
 	public GameObject[] StateObjects;
 	public RectTransform TitleLerper;
 	public Transform SelectableCharacters;
 	public GameObject SelectableCharacterLock;
+	public Transform SelectedCharacterNameTexts;
 
 	[HideInInspector]
 	public State CurrentState;
@@ -171,6 +176,27 @@ public class Game : MonoBehaviour
 		StartCoroutine( Co_JoinGame() );
 	}
 
+	public void ButtonBack()
+	{
+		switch ( CurrentState )
+		{
+			case State.Title:
+				Application.Quit();
+				break;
+			case State.CharacterSelect:
+				SwitchState( State.Title );
+				break;
+			case State.TitleToPlay:
+				break;
+			case State.Play:
+				break;
+			case State.PlayToTitle:
+				break;
+			default:
+				break;
+		}
+	}
+
 	public void ButtonPlay()
 	{
 		if ( UnlockedCharacters[(int) LocalPlayer.Instance.Player.CurrentAnimal] )
@@ -243,6 +269,13 @@ public class Game : MonoBehaviour
 		SelectableCharacters.GetChild( (int) anim ).gameObject.SetActive( true );
 		SelectableCharacters.GetChild( (int) anim ).GetComponentInChildren<Animator>().SetBool( "Spin", true );
 
+		// Update name
+		foreach ( var text in SelectedCharacterNameTexts.GetComponentsInChildren<Text>() )
+		{
+			text.text = CharacterNames[(int) LocalPlayer.Instance.Player.CurrentAnimal];
+		}
+
+		// Update locked
 		bool unlocked = UnlockedCharacters[(int) LocalPlayer.Instance.Player.CurrentAnimal];
 		SelectableCharacterLock.SetActive( !unlocked );
 		var button = "meen't :(";

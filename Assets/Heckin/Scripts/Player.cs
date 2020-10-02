@@ -94,11 +94,16 @@ public class Player : PunBehaviour
 			Followee.Chirp();
 		}
 
-		GameObject par = StaticHelpers.SpawnPrefab( "Particles/ChirpParticle" );
+		GameObject par = StaticHelpers.SpawnPrefab( "Particles/ChirpParticle", 1 );
 		par.transform.position = transform.position;
 		par.transform.eulerAngles = transform.eulerAngles;
 
 		GetComponentInChildren<Punchable>().Punch();
+
+		foreach ( Heck.ChallengeRacket challenge in Heck.UnlockManager.GetAll( typeof( Heck.ChallengeRacket ) ) )
+		{
+			challenge.OnChirp( this );
+		}
 
 		// Check for close objects with tags
 		GameObject obj = FindClosestEnemy();
@@ -108,13 +113,13 @@ public class Player : PunBehaviour
 			Vector3 pos = obj.transform.position;
 			Destroy( obj );
 
-			PhotonView.RPC( "SendSpawnFollower", PhotonTargets.All, pos, CurrentAnimal );
+			PhotonView.RPC( "SendSpawnFollower", PhotonTargets.All, pos, CurrentAnimal, photonView.viewID );
 		}
 		Chirp( obj != null );
 	}
 
 	[PunRPC]
-	public void SendSpawnFollower( Vector3 pos, Animal animal )
+	public void SendSpawnFollower( Vector3 pos, Animal animal, int localID )
 	{
 		GameObject par = StaticHelpers.EmitParticleDust( pos );
 		par.transform.localScale *= 2;
@@ -124,6 +129,7 @@ public class Player : PunBehaviour
 		follower.transform.position = pos;
 		follower.GetComponent<BordFollower>().ToFollow = LastFollower;
 		follower.GetComponent<BordFollower>().SetAnimal( animal );
+		follower.GetComponent<BordFollower>().LocalOwned = ( photonView.viewID == localID );
 		if ( Followee != null && LastFollower != null && LastFollower.GetComponent<BordFollower>() != null )
 		{
 			LastFollower.GetComponent<BordFollower>().Followee = follower.GetComponent<BordFollower>();
@@ -170,11 +176,16 @@ public class Player : PunBehaviour
 			Followee.Chirp();
 		}
 
-		GameObject par = StaticHelpers.SpawnPrefab( "Particles/ChirpParticle" );
+		GameObject par = StaticHelpers.SpawnPrefab( "Particles/ChirpParticle", 1 );
 		par.transform.position = transform.position;
 		par.transform.eulerAngles = transform.eulerAngles;
 
 		GetComponentInChildren<Punchable>().Punch();
+
+		foreach ( Heck.ChallengeRacket challenge in Heck.UnlockManager.GetAll( typeof( Heck.ChallengeRacket ) ) )
+		{
+			challenge.OnChirp( this );
+		}
 	}
 
 	public void NextAnimal()

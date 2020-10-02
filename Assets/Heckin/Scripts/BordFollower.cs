@@ -7,6 +7,8 @@ public class BordFollower : MonoBehaviour
 	public Transform ToFollow;
 	public BordFollower Followee;
 
+	[HideInInspector]
+	public bool LocalOwned = false;
 	private Animator _animator;
 	private Player.Animal CurrentAnimal;
 
@@ -61,6 +63,20 @@ public class BordFollower : MonoBehaviour
 
 		StaticHelpers.GetOrCreateCachedAudioSource( Player.GetClipForAnimal( CurrentAnimal ), transform, Random.Range( 0.8f, 1.2f ), 0.5f );
 		GetComponentInChildren<Punchable>().Punch();
+
+		GameObject par = StaticHelpers.SpawnPrefab( "Particles/ChirpParticle", 1 );
+		par.transform.SetParent( transform );
+		par.transform.position = transform.position;
+		par.transform.eulerAngles = transform.eulerAngles;
+		par.transform.localScale = Vector3.one;
+
+		if ( LocalOwned )
+		{
+			foreach ( Heck.ChallengeRacket challenge in Heck.UnlockManager.GetAll( typeof( Heck.ChallengeRacket ) ) )
+			{
+				challenge.OnChirp( LocalPlayer.Instance.Player );
+			}
+		}
 
 		yield return new WaitForSeconds( Random.Range( 0.1f, 0.2f ) / 2 );
 

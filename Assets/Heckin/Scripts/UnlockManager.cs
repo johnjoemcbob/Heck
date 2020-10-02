@@ -39,7 +39,10 @@ namespace Heck
 			Instance = this;
 
 			Unlocks.Add( new UnlockableGlide(), new ChallengeHighestPoint() );
-			Unlocks.Add( new UnlockableCharacter( 1 ), new ChallengeFarGlide() );
+			Unlocks.Add( new UnlockableCharacter( 1 ), new ChallengeConversation() );
+			Unlocks.Add( new UnlockableCharacter( 2 ), new ChallengeRacket() );
+			Unlocks.Add( new UnlockableCharacter( 3 ), new ChallengeChildren() );
+			Unlocks.Add( new UnlockableCharacter( 5 ), new ChallengeFarGlide() );
 
 			UnlockState = new bool[Unlocks.Count];
 
@@ -155,14 +158,33 @@ namespace Heck
 
 		public static BaseUnlockable Get( System.Type type )
 		{
-			foreach ( var unlock in Instance.Unlocks )
+			if ( Instance != null )
 			{
-				if ( unlock.Key.GetType() == type )
+				foreach ( var unlock in Instance.Unlocks )
 				{
-					return unlock.Key;
+					if ( unlock.Key.GetType() == type )
+					{
+						return unlock.Key;
+					}
 				}
 			}
 			return null;
+		}
+
+		public static BaseChallenge[] GetAll( System.Type type )
+		{
+			List<BaseChallenge> challenges = new List<BaseChallenge>();
+			if ( Instance != null )
+			{
+				foreach ( var unlock in Instance.Unlocks )
+				{
+					if ( unlock.Value.GetType() == type )
+					{
+						challenges.Add( unlock.Value );
+					}
+				}
+			}
+			return challenges.ToArray();
 		}
 
 		IEnumerator Co_Scoreout()

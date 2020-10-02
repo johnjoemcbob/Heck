@@ -5,250 +5,76 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 
+// Main class with helpers
 public class StaticHelpers
 {
-	public const int POOL_AUDIO_MAX = 128;
-	public const int POOL_PREFAB_MAX = 24;
-
-	public struct PooledAudio
-	{
-		public AudioSource Source;
-		public float Time;
-	}
-
-	#region ==Variables
-	public static Dictionary<string, AudioClip> AudioClips = new Dictionary<string, AudioClip>();
-
-	public static List<PooledAudio> AudioPool = new List<PooledAudio>();
-	public static Dictionary<string, List<GameObject>> PrefabPools = new Dictionary<string, List<GameObject>>();
-	#endregion
-
 	#region Statics
-	// Cache resource.loads?
-	// Cache a pool of each type
-	// Audio sources need some priority for player? or just lots
-	// Stop GameObject.Destroy - change number of parameters to track down code
-	public static GameObject GetOrCreateCachedPrefab( string path, Vector3 pos, Quaternion rot, Vector3 scale, float timeout = 1 )
-	{
-		GameObject prefab = null;
-		{
-			if ( PrefabPools.ContainsKey( path ) )
-			{
-				// Search prefabs for any disabled which are usable
-				foreach ( var cached in PrefabPools[path] )
-				{
-					if ( cached != null && !cached.activeSelf )
-					{
-						prefab = cached;
-						prefab.SetActive( true );
-						break;
-					}
-				}
-				//PrefabPools[path].Remove( null );
-			}
-			else
-			{
-				PrefabPools.Add( path, new List<GameObject>() );
-			}
-
-			// Couldn't find any, but still have space in the pool
-			if ( prefab == null && PrefabPools[path].Count < POOL_PREFAB_MAX )
-			{
-				prefab = SpawnPrefab( path );
-
-				PrefabPools[path].Add( prefab );
-			}
-
-			// Update prefab if found
-			if ( prefab != null )
-			{
-				prefab.transform.position = pos;
-				prefab.transform.rotation = rot;
-				prefab.transform.localScale = scale;
-
-				if ( timeout != 0 )
-				{
-					Game.Instance.StartCoroutine( DisableAfterTimeout( prefab, timeout ) );
-				}
-			}
-		}
-		return prefab;
-	}
-
-	public static IEnumerator DisableAfterTimeout( GameObject obj, float timeout )
-	{
-		yield return new WaitForSeconds( timeout );
-
-		if ( obj != null )
-		{
-			obj.transform.position = Vector3.one * 1000; // In case any objects with colliders start getting events (I don't know)
-			obj.SetActive( false );
-		}
-	}
-
 	public static GameObject EmitParticleImpact( Vector3 point )
 	{
-		return GetOrCreateCachedPrefab( "Particles/Particle Effect", point, Quaternion.identity, Vector3.one, 0.5f );
+		GameObject particle = GameObject.Instantiate( Resources.Load( "Prefabs/Particles/Particle Effect" ), Game.RuntimeParent ) as GameObject;
+		{
+			particle.transform.position = point;
+
+			GameObject.Destroy( particle, 1.5f );
+		}
+		return particle;
 	}
 
 	public static GameObject EmitParticleDust( Vector3 point )
 	{
-		return GetOrCreateCachedPrefab( "Particles/Particle Dust", point, Quaternion.Euler( -90, 0, 0 ), new Vector3( 1, 1, 0.5f ) * 0.1f, 2 );
+		GameObject particle = GameObject.Instantiate( Resources.Load( "Prefabs/Particles/Particle Dust" ), Game.RuntimeParent ) as GameObject;
+		{
+			particle.transform.position = point;
+
+			GameObject.Destroy( particle, 2 );
+		}
+		return particle;
 	}
 
-	public static GameObject SpawnPrefab( string name )
+	public static GameObject SpawnPrefab( string name, float destroytimer = 0 )
 	{
-		return SpawnResource( "Prefabs/" + name );
-	}
-	public static GameObject SpawnResource( string name )
-	{
-		GameObject prefab = GameObject.Instantiate( Resources.Load( name ) as GameObject, Game.RuntimeParent );
+		GameObject prefab = GameObject.Instantiate( Resources.Load( "Prefabs/" + name ), Game.RuntimeParent ) as GameObject;
+		if ( destroytimer != 0 )
+		{
+			GameObject.Destroy( prefab, destroytimer );
+		}
 		return prefab;
 	}
 
-	public static AudioSource SpawnResourceAudioSource( string clipname )
+	public static GameObject GetOrCreateCachedAudioSource( string clipname, Transform trans, float pitch = 1, float volume = 1, float delay = 0, bool force = true )
 	{
-		return SpawnAudioSource( GetOrLoadAudioClip( clipname ) );
+		var obj = SpawnResourceAudioSource( clipname, Vector3.zero, pitch, volume, delay );
+		obj.transform.SetParent( trans );
+		obj.transform.localPosition = Vector3.zero;
+		return obj;
 	}
 
-	public static AudioSource SpawnAudioSource( AudioClip clip )
+	public static GameObject GetOrCreateCachedAudioSource( string clipname, Vector3 point, float pitch = 1, float volume = 1, float delay = 0, bool force = true )
 	{
-		GameObject source = GameObject.Instantiate( Resources.Load( "Prefabs/Audio Source" ), Game.RuntimeParent ) as GameObject;
-		return source.GetComponent<AudioSource>();
+		return SpawnResourceAudioSource( clipname, point, pitch, volume, delay );
 	}
 
-	//public static AudioSource GetOrCreateCachedAudioSource( string clipname, bool spatial, float pitch = 1, float volume = 1, float delay = 0, bool force = false )
-	//{
-	//	var src = GetOrCreateCachedAudioSource( clipname, Camera.main.transform.position, pitch, volume, delay, force );
-	//	src.spatialBlend = 0;
-	//	return src;
-	//}
-	public static AudioSource GetOrCreateCachedAudioSource( string clipname, Transform parent, float pitch = 1, float volume = 1, float delay = 0, bool force = false )
+	public static GameObject SpawnResourceAudioSource( string clipname, Vector3 point, float pitch = 1, float volume = 1, float delay = 0 )
 	{
-		var src = GetOrCreateCachedAudioSource( GetOrLoadAudioClip( clipname ), Vector3.zero, pitch, volume, delay, force );
-		if ( src != null )
+		AudioClip clip = Resources.Load( "Sounds/" + clipname ) as AudioClip;
+		return SpawnAudioSource( clip, point, pitch, volume, delay );
+	}
+
+	public static GameObject SpawnAudioSource( AudioClip clip, Vector3 point, float pitch = 1, float volume = 1, float delay = 0 )
+	{
+		GameObject source = GameObject.Instantiate( Resources.Load( "Prefabs/Audio Source" ) ) as GameObject;
 		{
-			src.transform.parent = parent;
-			src.transform.localPosition = Vector3.zero;
-		}
-		return src;
-	}
-	public static AudioSource GetOrCreateCachedAudioSource( string clipname, Vector3 pos, float pitch = 1, float volume = 1, float delay = 0, bool force = false )
-	{
-		return GetOrCreateCachedAudioSource( GetOrLoadAudioClip( clipname ), pos, pitch, volume, delay, force );
-	}
-	public static AudioSource GetOrCreateCachedAudioSource( AudioClip clip, Vector3 pos, float pitch = 1, float volume = 1, float delay = 0, bool force = false )
-	{
-		AudioSource source = null;
-		{
-			// Search prefabs for any disabled which are usable
-			var toremove = new List<PooledAudio>();
-			int index = 0;
-			foreach ( var cached in AudioPool )
-			{
-				if ( cached.Source == null )
-				{
-					toremove.Add( cached );
-				}
-				else
-				{
-					//float percent = ( Time.time - cached.Time ) / cached.Source.clip.length;
-					//if ( percent >= 1 )
-					if ( !cached.Source.isPlaying )
-					{
-						source = cached.Source;
-						source.gameObject.SetActive( true );
-						break;
-					}
-				}
-				index++;
-			}
-			if ( source != null )
-			{
-				var local = AudioPool[index];
-				local.Time = Time.time;
-				AudioPool[index] = local;
-			}
-			foreach ( var remove in toremove )
-			{
-				AudioPool.Remove( remove );
-			}
+			source.transform.position = point;
 
-			// Couldn't find any, but still have space in the pool
-			if ( source == null && AudioPool.Count < POOL_AUDIO_MAX )
-			{
-				source = SpawnAudioSource( clip );
+			AudioSource audio = source.GetComponent<AudioSource>();
+			audio.clip = clip;
+			audio.pitch = pitch;
+			audio.volume = volume;
+			audio.PlayDelayed( delay );
 
-				var pooled = new PooledAudio();
-				{
-					pooled.Source = source;
-					pooled.Time = Time.time;
-				}
-				AudioPool.Add( pooled );
-			}
-
-			// None found and is forced priority
-			if ( source == null )// && force )
-			{
-				// Find oldeset audiosource
-				PooledAudio oldest = new PooledAudio();
-				float maxpercent = 0;
-				index = 0;
-				for ( int ind = 0; ind < AudioPool.Count; ind++ )
-				{
-					PooledAudio src = AudioPool[ind];
-					float percent = 1 - ( Time.time - src.Time ) / src.Source.clip.length;
-					if ( percent > maxpercent )
-					{
-						oldest = src;
-						maxpercent = percent;
-						index = ind;
-					}
-				}
-				source = oldest.Source;
-				oldest.Time = Time.time;
-				AudioPool[index] = oldest;
-			}
-
-			// Update prefab if found
-			if ( source != null )
-			{
-				source.transform.parent = Game.RuntimeParent;
-				source.transform.position = pos;
-
-				source.clip = clip;
-				source.pitch = pitch;
-				source.volume = volume;
-				source.spatialBlend = 1;
-				source.PlayDelayed( delay );
-
-				//if ( Game.Instance != null )
-				//{
-				//	Game.Instance.StartCoroutine( DisableAfterTimeout( source.gameObject, delay + clip.length + 0.1f ) );
-				//}
-			}
+			GameObject.Destroy( source, clip.length + 0.1f );
 		}
 		return source;
-	}
-
-	public static AudioClip GetOrLoadAudioClip( string clipname )
-	{
-		AudioClip clip = null;
-		{
-			if ( !AudioClips.ContainsKey( clipname ) )
-			{
-				AudioClips.Add( clipname, Resources.Load( "Sounds/" + clipname ) as AudioClip );
-			}
-			clip = AudioClips[clipname];
-		}
-		return clip;
-	}
-
-	public static void Reset()
-	{
-		// Reset static pools
-		AudioPool = new List<PooledAudio>();
-		PrefabPools = new Dictionary<string, List<GameObject>>();
 	}
 	#endregion
 }
